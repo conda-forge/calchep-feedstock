@@ -27,7 +27,7 @@ source:
       - patches/0004-link-VandP.so-against-libcalchep.patch
 
 build:
-  number: 0
+  number: 1
   # POSIX build system (Makefile + getFlags + sh); no Windows support.
   # osx (osx-64 + osx-arm64) is enabled via Darwin-specific handling in
   # build_cache.sh / install_calchep.sh (clang -dynamiclib, -install_name,
