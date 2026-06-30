@@ -1,5 +1,5 @@
 context:
-  version: "3.8.4"
+  version: "3.9.2"
 
 recipe:
   name: calchep
@@ -7,7 +7,7 @@ recipe:
 
 source:
   - url: https://theory.sinp.msu.ru/~pukhov/CALCHEP/calchep_${{ version }}.tgz
-    sha256: 802b7d7e776643b3a46f0611bb4f43f1ba9a84ebe071c251b2caf7ddb36e5043
+    sha256: 8e7d7b43cb56c53acae5617275a5ecc6b0efa5936e999c049a70a994bbf7d849
     patches:
       # initStrFun() writes nnan[i1-1]/sf_be[i1-1] before validating i1; called
       # as initStrFun(0) it writes nnan[-1], which the -O2 BSS layout overlaps
@@ -27,7 +27,7 @@ source:
       - patches/0004-link-VandP.so-against-libcalchep.patch
 
 build:
-  number: 1
+  number: 0
   # POSIX build system (Makefile + getFlags + sh); no Windows support.
   # osx (osx-64 + osx-arm64) is enabled via Darwin-specific handling in
   # build_cache.sh / install_calchep.sh (clang -dynamiclib, -install_name,
