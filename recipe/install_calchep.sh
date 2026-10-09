@@ -95,10 +95,10 @@ sed -i "s| -o n_calchep| -Wl,-rpath,${_ORIGIN} -o n_calchep|" "${CALCHEP_HOME}/s
 # archives: replace num_c.a with -lcalchep + an rpath to $CALCHEP/lib (so the
 # freshly built n_calchep finds it), and drop the other core archives now subsumed
 # by the .so. -Wl,--allow-shlib-undefined is required because the combined .so also
-# contains CalcHEP's optional-feature objects (the LHAPDF interface sf_lha.o and the
-# Fortran-SLHA bridge fortran.o) whose external symbols (evolvePDFm, fortranreadline_,
-# ...) are absent unless those features are used; they resolve lazily at run time only
-# if exercised (otherwise dead). dummy.a stays static and last (overridable user
+# contains objects whose external symbols it does not define itself (the LHAPDF
+# interface sf_lha.o, whose LHAPDF API comes from lib/lhapdf.so, and the usrfun/usrFF
+# hooks, which come from dummy.a or the user); they resolve at the consumer link or
+# lazily at run time. dummy.a stays static and last (overridable user
 # stubs), as does dynamic_vp.a (the model-table storage that must NOT enter the .so;
 # bin/make_main is its only consumer -- see build_cache.sh); sqme_aux.so and the
 # per-process lib_0.a/ld*.a/lf*.so are untouched.
@@ -112,6 +112,16 @@ sed -i -E \
   -e 's@\$lib/num_c\.a@-L$lib -Wl,-rpath,$lib -Wl,--allow-shlib-undefined -lcalchep@' \
   -e 's@\$lib/(ntools|dynamic_me|libSLHAplus|serv)\.a@@g' \
   "${CALCHEP_HOME}/bin/make_main"
+
+# As of v3.9.2 the LHAPDF API (listLHA, initpdfLHA, ...) that sf_lha.o in
+# libcalchep.so calls is provided by lib/lhapdf.so (a stub unless CalcHEP is built
+# against LHAPDF) and no longer by dummy.a. Upstream's sbin/ld_n links it, but
+# bin/make_main does not, so a make_main program (e.g. utile/main_22.c) fails at
+# run time with "undefined symbol: listLHA". Link lhapdf.so there too, in the same
+# position as in ld_n. The grep makes the build fail if upstream changes the link
+# line so that the sed no longer applies.
+sed -i -E 's@(\$CALCHEP/include/VandPgate\.c)@\1 $lib/lhapdf.so@' "${CALCHEP_HOME}/bin/make_main"
+grep -q -F '$lib/lhapdf.so' "${CALCHEP_HOME}/bin/make_main"
 
 # macOS ld64 spelling of the consumer-link allow-undefined flag (mirrors the
 # build_cache.sh translation for VandP.so): GNU's --allow-shlib-undefined ->

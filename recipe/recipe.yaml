@@ -121,6 +121,8 @@ outputs:
             - share/calchep/lib/dummy.a
             - share/calchep/lib/dynamic_vp.a
             - share/calchep/lib/sqme_aux.so
+            # LHAPDF API stubs, linked by sbin/ld_n and bin/make_main (v3.9.2+).
+            - share/calchep/lib/lhapdf.so
             - etc/conda/activate.d/calchep_activate.sh
             - etc/conda/activate.d/calchep_activate.csh
             - etc/conda/activate.d/calchep_activate.fish
