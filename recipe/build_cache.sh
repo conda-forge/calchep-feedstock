@@ -113,10 +113,10 @@ make </dev/null
 # give each its own copy and break the engine. --whole-archive pulls in every object
 # so all symbols are present; symbols provided by n_calchep.o and the per-process
 # libs stay undefined and resolve at the run-time n_calchep link (normal for a .so).
-# dummy.a (overridable stubs: usrfun/usrFF + the LHAPDF API) is intentionally kept
+# dummy.a (overridable stubs: usrfun/usrFF) is intentionally kept
 # static and linked last by ld_n -- a static-archive member is pulled in only if its
-# symbol is otherwise undefined, so a user's real LHAPDF/usrfun overrides the stub (a
-# .so would always define them and shadow the user's, e.g. silently disabling LHAPDF).
+# symbol is otherwise undefined, so a user's real usrfun/usrFF overrides the stub (a
+# .so would always define them and shadow the user's).
 # dynamic_vp.a (vp_dynam.o) is likewise kept OUT of the .so: sbin/ld_n
 # never links it into n_calchep, and it defines the model tables (nModelParticles,
 # ModelPrtcls, varNames, varValues, ...) as -fcommon tentative globals. Those must
@@ -131,8 +131,10 @@ make </dev/null
 # linked in because the C half (libSLHAplus's fortran.o, pulled by --whole-archive)
 # calls it at run time, so -lgfortran is needed too (libgfortran is already a run dep
 # via the Fortran compiler's run-export). The LHAPDF interface (sf_lha.o) keeps its
-# undefined libLHAPDF symbols (evolvePDFm, ...): LHAPDF is opt-in, so they resolve
-# lazily at run time only when a user supplies LHAPDF -- hence the consumer links use
+# LHAPDF API symbols (listLHA, initpdfLHA, ...) undefined: as of v3.9.2 upstream
+# provides them in the separate lib/lhapdf.so (a stub, as this build does not set
+# LHAPDF), which the consumer links add next to -lcalchep. The .so also leaves
+# usrfun/usrFF (dummy.a or the user's own) undefined -- hence the consumer links use
 # -Wl,--allow-shlib-undefined (see install_calchep.sh and patches/0004).
 # Linux uses GNU ld (--whole-archive); macOS uses ld64 (-force_load per archive,
 # -dynamiclib + -install_name, and -undefined dynamic_lookup because a macOS dylib
