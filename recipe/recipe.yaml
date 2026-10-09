@@ -60,6 +60,8 @@ outputs:
         # GNU sed: on macOS build_cache.sh rewrites the GNU allow-undefined link
         # flag to the ld64 spelling before building, and the system BSD sed differs.
         - sed
+        # GNU grep: build_cache.sh uses it to find the files that sed rewrites.
+        - grep
 
   - package:
       name: calchep
@@ -85,6 +87,9 @@ outputs:
         - ${{ compiler("c") }}
         - ${{ compiler("fortran") }}
         - sed
+        # GNU grep: install_calchep.sh uses it to find the scripts to rewrite and to
+        # check that its make_main link edit applied.
+        - grep
       run:
         # The run-time-generated bin/ scripts (run_batch, ...) are Perl.
         - perl
